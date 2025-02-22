@@ -1,6 +1,6 @@
 import java.io.{File, PrintWriter}
 
-trait CSVSinkSimple[T] {
+trait CSVSinkSimple[T] extends DataSink[T] {
   def location: String
   
   def write(rows: List[T]): Unit = {

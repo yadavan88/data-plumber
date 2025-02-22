@@ -5,7 +5,7 @@ import java.io.File
 import scala.io.Source
 
 // CSV Source
-trait CsvSource[T] {
+trait CsvSource[T <: Product] {
   def location: String
 
   inline def read(using m: Mirror.ProductOf[T]): List[T] = {

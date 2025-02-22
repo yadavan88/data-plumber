@@ -5,10 +5,11 @@ import java.io.File
 import scala.io.Source
 
 // CSV Source
-trait CsvSourceSimple[T] {
+trait CsvSourceSimple[T] extends DataSource[T] {
   def location: String
 
   def read: List[T] = {
+    println(s"reading from csv file: $location")
     val source = Source.fromFile(location)
     try {
       val lines = source.getLines().toList
