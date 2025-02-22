@@ -6,7 +6,7 @@ import com.mongodb.ConnectionString
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 
-trait MongoSink[T] {
+trait MongoSink[T] extends DataSink[T] {
   def collectionName: String
   def mongoUri: String
 
