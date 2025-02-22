@@ -1,8 +1,9 @@
-import scala.deriving.Mirror
-import scala.compiletime.{erasedValue, summonInline}
-import java.time.{LocalDate, LocalDateTime}
+package com.yadavan88.dataplumber
+
 import java.time.format.DateTimeFormatter
-import java.time.ZoneOffset
+import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+import scala.compiletime.{erasedValue, summonInline}
+import scala.deriving.Mirror
 
 // Type class for parsing a CSV value to any type
 trait CsvParser[T]:

@@ -1,10 +1,12 @@
+package com.yadavan88.dataplumber.simple.source
+
 import com.mongodb.client.MongoClients
-import scala.jdk.CollectionConverters._
+import com.mongodb.{ConnectionString, MongoClientSettings}
 import org.bson.Document
-import com.mongodb.MongoClientSettings
-import com.mongodb.ConnectionString
+
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
+import scala.jdk.CollectionConverters.*
 
 trait MongoSource[T] {
   def collectionName: String

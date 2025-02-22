@@ -1,6 +1,11 @@
-import java.time.LocalDate
-import java.time.LocalDateTime
+package examples.simple
+
+import com.yadavan88.dataplumber.simple.DataPlumber
+import com.yadavan88.dataplumber.simple.source.*
+import com.yadavan88.dataplumber.simple.sink.*
 import org.bson.Document
+
+import java.time.{LocalDate, LocalDateTime}
 enum LogType {
   case CaptainsLog, FirstOfficerLog, ChiefMedicalLog, ChiefEngineerLog,
     PersonalLog
@@ -23,7 +28,7 @@ case class MongoStarLogEntry(
     starfleetTime: LocalDateTime
 )
 
-class StarLogSource extends CsvSourceSimple[StarLogEntry] {
+class StarLogSource extends CsvSource[StarLogEntry] {
 
   override protected def fromCSVRow(row: String): StarLogEntry =
     row.split(",").map(_.trim) match {
@@ -67,7 +72,7 @@ class StarLogSink extends MongoSink[MongoStarLogEntry] {
 }
 
 class StarLogIntegrator extends DataPlumber[StarLogEntry, MongoStarLogEntry] {
-  override def source: CsvSourceSimple[StarLogEntry] = new StarLogSource()
+  override def source: CsvSource[StarLogEntry] = new StarLogSource()
   override def sink: MongoSink[MongoStarLogEntry] = new StarLogSink()
   override def transform(list: List[StarLogEntry]): List[MongoStarLogEntry] = {
     list.map(value =>

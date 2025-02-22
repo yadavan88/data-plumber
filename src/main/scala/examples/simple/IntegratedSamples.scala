@@ -1,17 +1,21 @@
-import scala.deriving.Mirror
-import scala.compiletime.{erasedValue, summonInline}
-import java.time.{LocalDate, LocalDateTime}
-import java.time.format.DateTimeFormatter
-import java.time.ZoneOffset
-import java.io.File
-import scala.io.Source
-import org.bson.Document
-import com.mongodb.ConnectionString
-import com.mongodb.MongoClientSettings
-import java.util.concurrent.TimeUnit
-import scala.concurrent.duration._
+package examples.simple
+
 import com.mongodb.client.MongoClients
+import com.mongodb.{ConnectionString, MongoClientSettings}
+import com.yadavan88.dataplumber.simple.*
+import com.yadavan88.dataplumber.simple.source.*
+import com.yadavan88.dataplumber.simple.sink.*
 import doobie.generic.auto.*
+import org.bson.Document
+
+import java.io.File
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+import java.util.concurrent.TimeUnit
+import scala.compiletime.{erasedValue, summonInline}
+import scala.concurrent.duration.*
+import scala.deriving.Mirror
+import scala.io.Source
 // trait CsvIntegrator[T] {
 //   def location: String
 
@@ -29,9 +33,9 @@ import doobie.generic.auto.*
 
 case class Domain(name: String, count: Long, percentage: Double) 
 
-class DomainCsvIntegrator(val location: String) extends CsvSource[Domain]
+class DomainCsvIntegrator(val location: String) extends GenericCsvSource[Domain]
 
-class DomainSimpleCsvIntegrator(val location: String) extends CsvSourceSimple[Domain] {
+class DomainSimpleCsvIntegrator(val location: String) extends CsvSource[Domain] {
   override def fromCSVRow(row: String): Domain = {
     val fields = row.split(",").map(_.trim).toList
     Domain(fields(0), fields(1).toLong, fields(2).toDouble)
@@ -73,9 +77,9 @@ class DomainPostgresIntegrator(val tableName: String)
     "jdbc:postgresql://localhost:5432/University?user=user&password=Password!2024"
 }
 
-class DomainCSVWriter(val location: String) extends CSVSink[Domain]
+class DomainGenericCSVWriter(val location: String) extends GenericCSVSink[Domain]
 
-class DomainSimpleCSVWriter(val location: String) extends CSVSinkSimple[Domain] {
+class DomainSimpleCSVWriter(val location: String) extends CSVSink[Domain] {
 
   override protected def headers: String = "name,count,percentage"
 
@@ -113,7 +117,7 @@ def main = {
 
 
   println("writing to csv.... ")
-  val csvWriter = DomainCSVWriter("/Users/yadukrishnankrishnan/source/integrator/domain-2.csv")
+  val csvWriter = DomainGenericCSVWriter("/Users/yadukrishnankrishnan/source/integrator/domain-2.csv")
   val updatedDomains = domains.map(d => d.copy(count = d.count * 10, name = d.name + " updated"))
   csvWriter.write(updatedDomains)
 

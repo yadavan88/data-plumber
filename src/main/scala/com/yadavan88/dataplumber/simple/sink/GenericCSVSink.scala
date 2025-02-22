@@ -1,9 +1,10 @@
-import java.io.File
-import java.io.PrintWriter
-import scala.deriving.Mirror
-import scala.compiletime.{constValueTuple, summonInline}
+package com.yadavan88.dataplumber.simple.sink
 
-trait CSVSink[T <: Product] {
+import java.io.{File, PrintWriter}
+import scala.compiletime.{constValueTuple, summonInline}
+import scala.deriving.Mirror
+
+trait GenericCSVSink[T <: Product] {
   def location: String
 
   inline def labelsOf(using m: Mirror.ProductOf[T]) = {

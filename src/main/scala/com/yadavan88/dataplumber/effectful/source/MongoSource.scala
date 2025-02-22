@@ -1,12 +1,15 @@
-import com.mongodb.client.MongoClients
-import scala.jdk.CollectionConverters._
-import org.bson.Document
-import com.mongodb.MongoClientSettings
-import com.mongodb.ConnectionString
-import java.util.concurrent.TimeUnit
-import scala.concurrent.duration._
+package com.yadavan88.dataplumber.effectful.source
 
-trait MongoSink[T] {
+import cats.effect.IO
+import com.mongodb.client.MongoClients
+import com.mongodb.{ConnectionString, MongoClientSettings}
+import org.bson.Document
+
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.*
+import scala.jdk.CollectionConverters.*
+
+trait MongoSource[T] {
   def collectionName: String
   def mongoUri: String
 
@@ -23,9 +26,9 @@ trait MongoSink[T] {
   private val database = mongoClient.getDatabase(connectionString.getDatabase)
   private val collection = database.getCollection(collectionName)
 
-  def write(rows: List[T]): Unit = {
-    val documents = rows.map(toDocument)
-    collection.insertMany(documents.asJava)
+  def read: IO[List[T]] = {
+    val res = collection.find().iterator().asScala.toList
+    IO(res.map(doc => fromDocument(doc)))
   }
-  protected def toDocument(value: T): Document
+  protected def fromDocument(doc: Document): T
 }

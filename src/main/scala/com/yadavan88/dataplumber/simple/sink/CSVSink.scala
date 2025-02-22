@@ -1,6 +1,10 @@
+package com.yadavan88.dataplumber.simple.sink
+
+import com.yadavan88.dataplumber.simple.DataSink
+
 import java.io.{File, PrintWriter}
 
-trait CSVSinkSimple[T] extends DataSink[T] {
+trait CSVSink[T] extends DataSink[T] {
   def location: String
   
   def write(rows: List[T]): Unit = {

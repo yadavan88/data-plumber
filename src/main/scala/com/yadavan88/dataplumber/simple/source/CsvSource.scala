@@ -1,11 +1,15 @@
-import scala.deriving.Mirror
-import scala.compiletime.{erasedValue, summonInline}
-import java.time.ZoneOffset
+package com.yadavan88.dataplumber.simple.source
+
+import com.yadavan88.dataplumber.simple.DataSource
+
 import java.io.File
+import java.time.ZoneOffset
+import scala.compiletime.{erasedValue, summonInline}
+import scala.deriving.Mirror
 import scala.io.Source
 
 // CSV Source
-trait CsvSourceSimple[T] extends DataSource[T] {
+trait CsvSource[T] extends DataSource[T] {
   def location: String
 
   def read: List[T] = {

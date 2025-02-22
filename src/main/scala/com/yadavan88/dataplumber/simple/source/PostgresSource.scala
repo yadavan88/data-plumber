@@ -1,8 +1,10 @@
-import doobie._
-import doobie.implicits._
-import doobie.postgres.implicits._
+package com.yadavan88.dataplumber.simple.source
+
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import doobie.*
+import doobie.implicits.*
+import doobie.postgres.implicits.*
 
 trait PostgresSource[T] {
   def tableName: String

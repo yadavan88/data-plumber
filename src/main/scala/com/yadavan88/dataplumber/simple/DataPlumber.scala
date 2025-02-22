@@ -1,3 +1,5 @@
+package com.yadavan88.dataplumber.simple
+
 trait DataPlumber[S, D] {
     def source: DataSource[S]
     def sink: DataSink[D]
