@@ -11,7 +11,7 @@ import com.yadavan88.dataplumber.offsetable.ReadResult
 import com.yadavan88.dataplumber.offsetable.Offsetable
 import java.time.LocalDateTime
 
-trait PostgresSource[T <: Offsetable: Read] extends DataSource[T] {
+trait OffsetablePostgresSource[T <: Offsetable: Read] extends DataSource[T] {
   def tableName: String
   def connectionString: String
 

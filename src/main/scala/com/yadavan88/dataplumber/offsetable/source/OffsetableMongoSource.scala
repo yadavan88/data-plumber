@@ -14,7 +14,7 @@ import com.mongodb.client.model.Sorts
 import com.yadavan88.dataplumber.offsetable.ReadResult
 import java.time.LocalDateTime
 
-trait MongoSource[T] extends DataSource[T] {
+trait OffsetableMongoSource[T] extends DataSource[T] {
   def collectionName: String
   def mongoUri: String
   def batchSize: Int = 100

@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters.*
 import com.yadavan88.dataplumber.offsetable.Offset
 import java.time.LocalDateTime
 
-trait MongoSink[T] extends DataSink[T] {
+trait OffsetableMongoSink[T] extends DataSink[T] {
   def collectionName: String
   def mongoUri: String
 

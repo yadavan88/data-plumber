@@ -9,7 +9,7 @@ import doobie.*
 import doobie.implicits.*
 import doobie.postgres.implicits.*
 
-trait PostgresSink[T: Write] extends DataSink[T] {
+trait OffsetablePostgresSink[T: Write] extends DataSink[T] {
   def tableName: String
   def connectionString: String
 

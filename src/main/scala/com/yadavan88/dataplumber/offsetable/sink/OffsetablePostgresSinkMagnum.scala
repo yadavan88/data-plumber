@@ -9,7 +9,7 @@ import com.augustnagro.magnum.DbCon
 import com.augustnagro.magnum.*
 import com.yadavan88.dataplumber.offsetable.Offsetable
 
-trait PostgresSinkMagnum[T] extends DataSink[T] {
+trait OffsetablePostgresSinkMagnum[T] extends DataSink[T] {
 
   implicit val repo: Repo[T, T, Long]
   def tableName: String

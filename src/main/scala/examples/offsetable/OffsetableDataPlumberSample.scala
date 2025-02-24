@@ -5,26 +5,26 @@ import examples.effectful.MongoStarLogEntry
 import com.yadavan88.dataplumber.offsetable.OffsetableDataPlumber
 import com.yadavan88.dataplumber.offsetable.DataSource
 import com.yadavan88.dataplumber.offsetable.DataSink
-import com.yadavan88.dataplumber.offsetable.source.CsvSource
+import com.yadavan88.dataplumber.offsetable.source.OffsetableCsvSource
 import com.yadavan88.dataplumber.*
-import com.yadavan88.dataplumber.offsetable.sink.MongoSink
+import com.yadavan88.dataplumber.offsetable.sink.OffsetableMongoSink
 import examples.effectful.LogType
 import org.bson.Document
 import cats.effect.IO
 import java.time.LocalDateTime
 import com.yadavan88.dataplumber.offsetable.ReadResult
-import com.yadavan88.dataplumber.offsetable.source.MongoSource
+import com.yadavan88.dataplumber.offsetable.source.OffsetableMongoSource
 import java.time.LocalDate
-import com.yadavan88.dataplumber.offsetable.sink.PostgresSink
+import com.yadavan88.dataplumber.offsetable.sink.OffsetablePostgresSink
 import doobie.util.Write
 import doobie.util.meta.Meta
 import doobie.util.Put
 import java.time.ZoneOffset
-import com.yadavan88.dataplumber.offsetable.sink.PostgresSinkMagnum
+import com.yadavan88.dataplumber.offsetable.sink.OffsetablePostgresSinkMagnum
 import com.augustnagro.magnum.Repo
 
 
-class StarLogOffsetableCsvSource extends CsvSource[StarLogEntry] {
+class StarLogOffsetableCsvSource extends OffsetableCsvSource[StarLogEntry] {
 
   override protected def fromCSVRow(row: String): StarLogEntry =
     GenericCSVParser.fromCsvRow[StarLogEntry](row.split(",").toList)
@@ -37,7 +37,7 @@ class StarLogOffsetableCsvSource extends CsvSource[StarLogEntry] {
 
 }
 
-class StarLogOffsetableMongoSink extends MongoSink[MongoStarLogEntry] {
+class StarLogOffsetableMongoSink extends OffsetableMongoSink[MongoStarLogEntry] {
 
   override def mongoUri: String = "mongodb://mongoadmin:mongopassword@localhost:27027/starlog?authMechanism=SCRAM-SHA-256&authSource=admin"  
   override def collectionName: String = "starlog-offsetable"
@@ -54,7 +54,7 @@ class StarLogOffsetableMongoSink extends MongoSink[MongoStarLogEntry] {
   }
 }
 
-class StarLogOffsetableMongoSource extends MongoSource[MongoStarLogEntry] {
+class StarLogOffsetableMongoSource extends OffsetableMongoSource[MongoStarLogEntry] {
 
   // reducing the batch size to 2 for demo
   override def batchSize: Int = 2
@@ -78,7 +78,7 @@ class StarLogOffsetableMongoSource extends MongoSource[MongoStarLogEntry] {
 //   override def tableName: String = "starlog_offsetable"
 // }
 
-class StarLogOffsetablePostgresSink(using Write[StarLogEntry]) extends PostgresSinkMagnum[StarLogEntry] {
+class StarLogOffsetablePostgresSink(using Write[StarLogEntry]) extends OffsetablePostgresSinkMagnum[StarLogEntry] {
 
   override implicit val repo: Repo[StarLogEntry, StarLogEntry, Long] = Repo[StarLogEntry, StarLogEntry, Long]
 

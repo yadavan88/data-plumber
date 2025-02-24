@@ -7,7 +7,7 @@ import java.io.{File, PrintWriter}
 import com.yadavan88.dataplumber.offsetable.Offset
 import java.time.LocalDateTime
 
-trait CSVSink[T] extends DataSink[T] {
+trait OffsetableCSVSink[T] extends DataSink[T] {
   def location: String
   
   def write(rows: List[T], readOffset: Option[Offset]): IO[Unit] = {

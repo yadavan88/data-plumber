@@ -12,7 +12,7 @@ import com.yadavan88.dataplumber.offsetable.Offset
 import com.yadavan88.dataplumber.offsetable.ReadResult
 import cats.effect.kernel.Resource
 
-trait CsvSource[T] extends DataSource[T] {
+trait OffsetableCsvSource[T] extends DataSource[T] {
   def location: String
 
   def read(offset: Option[Offset]): IO[ReadResult[T]] = {

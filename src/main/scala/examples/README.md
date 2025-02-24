@@ -108,7 +108,7 @@ Use the same data models as before.
 Extend the appropriate source trait (e.g., `CsvSource` or `MongoSource`):
 
 ```scala
-class StarLogOffsetableCsvSource extends CsvSource[StarLogEntry] {
+class StarLogOffsetableCsvSource extends OffsetableCsvSource[StarLogEntry] {
   override protected def fromCSVRow(row: String): StarLogEntry =
     GenericCSVParser.fromCsvRow[StarLogEntry](row.split(",").toList)
 
@@ -152,7 +152,7 @@ trait MongoSource[T] extends DataSource[T] {
 This uses the offset value and build the next query. 
 And then we can build the Source Implemantation as:
 ```scala
-class StarLogOffsetableMongoSource extends MongoSource[MongoStarLogEntry] {
+class StarLogOffsetableMongoSource extends OffsetableMongoSource[MongoStarLogEntry] {
 
   // reducing the batch size to 2 for demo
   override def batchSize: Int = 2
@@ -177,7 +177,7 @@ This uses the offset and batchsize
 Extend the appropriate sink trait (e.g., `MongoSink` or `PostgresSink`):
 
 ```scala
-class StarLogOffsetableMongoSink extends MongoSink[MongoStarLogEntry] {
+class StarLogOffsetableMongoSink extends OffsetableMongoSink[MongoStarLogEntry] {
   override def mongoUri: String = "mongodb://mongoadmin:mongopassword@localhost:27027/starlog"
   override def collectionName: String = "starlog-offsetable"
 
