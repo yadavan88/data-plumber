@@ -31,6 +31,11 @@ It intentionally does not cover production concerns such as:
 Data Plumber provides three different integration patterns to handle various data transfer scenarios.
 
 Examples of different types are [available here](src/main/scala/examples).
+Before running the samples, you'll need to start the required services using Docker:
+```
+docker compose up
+```
+
 
 ## 1. Simple Integration
 
@@ -103,3 +108,12 @@ All integration types share these common elements:
 - Custom implementations possible
 
 Each integration type builds upon the previous one, adding more features and complexity as needed for your use case.
+
+
+# How to run the sample
+Before running the samples, you'll need to start the required services using Docker. Here's how to set up MongoDB, PostgreSQL, and Redis:
+
+```
+docker compose up
+```
+This starts MongoDB, PostgreSQL and Redis services required. 
