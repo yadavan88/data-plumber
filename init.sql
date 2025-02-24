@@ -9,12 +9,12 @@ CREATE TABLE starlog_offsetable (
 );
 
 -- for magnum sink
-CREATE TABLE starlogentry (
+CREATE TABLE star_log_entry (
   --id SERIAL PRIMARY KEY,
-  stardate DOUBLE PRECISION,
-  logtype VARCHAR(50),
-  crewid INTEGER,
+  star_date DOUBLE PRECISION,
+  log_type VARCHAR(50),
+  crew_id INTEGER,
   entry TEXT,
-  planetarydate DATE,
-  starfleettime TIMESTAMP
+  planetary_date DATE,
+  starfleet_time TIMESTAMP
 );

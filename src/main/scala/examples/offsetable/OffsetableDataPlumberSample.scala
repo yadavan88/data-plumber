@@ -158,8 +158,17 @@ import cats.effect.unsafe.implicits.global
 
 @main
 def startOffsetablePlumber = {
-  val plumber = new OffsetableCsvToMongoPlumber()
-  plumber.run.unsafeRunSync() 
-  val plumber2 = new OffsetableMongoToPostgresDataPlumber()
-  plumber2.run.unsafeRunSync() 
+  import cats.syntax.*
+  val csvToMongo = new OffsetableCsvToMongoPlumber()
+  csvToMongo.run.unsafeRunSync() 
+  val mongoToPG = new OffsetableMongoToPostgresDataPlumber()
+
+  def processUntilEmpty: IO[Unit] = for {
+    count <- mongoToPG.run
+    _ <- IO.println(s"Processed $count records")
+    _ <- if (count > 0) processUntilEmpty else IO.println("Processing complete!")
+  } yield ()
+
+  processUntilEmpty.unsafeRunSync()
+
 }

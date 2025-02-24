@@ -10,3 +10,5 @@ hs_err_pid*
 .bsp/**
 .scala-build/**
 .DS_Store
+**/.bloop/**
+**/metals.sbt

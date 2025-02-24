@@ -34,6 +34,8 @@ trait OffsetableMongoSource[T] extends DataSource[T] {
 
   def read(offset: Option[Offset]): IO[ReadResult[T]] = {
     IO {
+      println(s"Offset in MongoSource: ${offset}")
+      
       val filter = offset
         .map { off =>
           Document.parse(

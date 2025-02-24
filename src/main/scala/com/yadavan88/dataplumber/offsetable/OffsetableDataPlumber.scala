@@ -31,10 +31,10 @@ trait OffsetableDataPlumber[S, D] {
       newOffset <- sink.write(transformed, offset)
       _ <- setNewOffset(readResult.nextOffset)
       _ <- IO.println(s"**** Successfully processed ${readResult.rows.size} rows ****")
-    } yield ()).recoverWith {
+    } yield readResult.rows.size).recoverWith {
       case NonFatal(error) =>
         IO.println(s"Error occurred while running DataPlumber: $error. Performing error handling hook") >>
-          handleError(error)
+          handleError(error).map(_ => -1)
     }
   }
 
