@@ -72,10 +72,6 @@ Adds support for effect handling using cats-effect IO, providing better error ha
 - Resource safety
 - Composable operations
 
-### Example:
-```scala
-
-```
 
 
 ## 3. Offsetable Integration
@@ -92,8 +88,8 @@ More advanced integration pattern with support for offset tracking using Redis, 
 - Locking mechanism on the Source (TBA)
 
 ### Example:
-```scala
-```
+
+[Offsetable Sample](src/main/scala/examples#offsetable-data-plumber-framework)
 
 
 ## Common Components
