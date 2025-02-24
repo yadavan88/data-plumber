@@ -30,6 +30,8 @@ It intentionally does not cover production concerns such as:
 # Integration Types
 Data Plumber provides three different integration patterns to handle various data transfer scenarios.
 
+Examples of different types are [available here](src/main/scala/examples).
+
 ## 1. Simple Integration
 
 The simplest form of data integration with synchronous execution and no additional features.
