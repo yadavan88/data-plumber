@@ -116,3 +116,4 @@ Before running the samples, you'll need to start the required services using Doc
 docker compose up
 ```
 This starts MongoDB, PostgreSQL and Redis services required. 
+Then you can run the main classes inside the `example` directory
