@@ -8,11 +8,17 @@ import com.yadavan88.dataplumber.effectful.*
 import org.bson.Document
 
 import java.time.{LocalDate, LocalDateTime}
+import com.augustnagro.magnum.DbCodec
+import com.augustnagro.magnum.Table
+import com.augustnagro.magnum.PostgresDbType
+import com.augustnagro.magnum.SqlNameMapper
 
 enum LogType {
   case CaptainsLog, FirstOfficerLog, ChiefMedicalLog, ChiefEngineerLog,
     PersonalLog
 }
+
+@Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 case class StarLogEntry(
     starDate: Double,
     logType: LogType,
@@ -20,7 +26,18 @@ case class StarLogEntry(
     entry: String,
     planetaryDate: LocalDate,
     starfleetTime: LocalDateTime
-)
+) derives DbCodec
+
+object StarLogEntry {
+  given DbCodec[LocalDate] = DbCodec[java.sql.Date].biMap(
+    str => LocalDate.parse(str.toString),
+    date => java.sql.Date.valueOf(date)
+  )
+  given DbCodec[LocalDateTime] = DbCodec[java.sql.Timestamp].biMap(
+    ts => ts.toLocalDateTime,
+    dt => java.sql.Timestamp.valueOf(dt)
+  )
+}
 
 case class MongoStarLogEntry(
     starDate: Double,
@@ -91,7 +108,8 @@ class StarLogIntegrator extends DataPlumber[StarLogEntry, MongoStarLogEntry] {
     )
   }
 
-  override def handleError(error: Throwable): IO[Unit] = IO.println("*** Failed while processing StarLog! ***")
+  override def handleError(error: Throwable): IO[Unit] =
+    IO.println("*** Failed while processing StarLog! ***")
 }
 
 @main

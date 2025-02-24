@@ -6,6 +6,7 @@ hs_err_pid*
 .vscode/**
 .metals/**
 .idea/**
-target/**
+**/target/**
 .bsp/**
 .scala-build/**
+.DS_Store

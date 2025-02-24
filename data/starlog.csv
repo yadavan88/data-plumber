@@ -1,0 +1,6 @@
+starDate,logType,crewId,entry,planetaryDate,starfleetTime
+47457.1,CaptainsLog,1001,We are approaching the planet,2025-01-01,2025-01-01T05:00:01
+47457.2,FirstOfficerLog,1002,Captain has given me the shore leave,2025-01-02,2025-01-02T04:00:02
+47457.3,ChiefMedicalLog,1003,The crew seems tired,2025-01-03,2025-01-03T03:00:03
+47457.4,ChiefEngineerLog,1004,The warp engine is running at maximum capacity,2025-01-04,2025-01-04T02:00:04
+47457.5,PersonalLog,1005,Qapla! Today is a good day to die,2025-01-05,2025-01-05T01:00:05

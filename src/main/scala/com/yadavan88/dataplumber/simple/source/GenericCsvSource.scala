@@ -1,6 +1,6 @@
 package com.yadavan88.dataplumber.simple.source
 
-import com.yadavan88.dataplumber.fromCsvRow
+import com.yadavan88.dataplumber.GenericCSVParser.fromCsvRow
 
 import java.io.File
 import java.time.ZoneOffset

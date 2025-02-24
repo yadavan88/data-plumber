@@ -1,7 +1,7 @@
 package com.yadavan88.dataplumber.effectful.source
 
 import cats.effect.IO
-import com.yadavan88.dataplumber.fromCsvRow
+import com.yadavan88.dataplumber.GenericCSVParser.fromCsvRow
 
 import java.io.File
 import java.time.ZoneOffset

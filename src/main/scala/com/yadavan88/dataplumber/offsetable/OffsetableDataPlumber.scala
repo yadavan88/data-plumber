@@ -5,7 +5,6 @@ import cats.effect.IO
 import java.time.LocalDateTime
 import scala.util.control.NonFatal
 import cats.effect.implicits.*
-import cats.effect.*
 import cats.syntax.traverse.*
 
 trait OffsetableDataPlumber[S, D] {
@@ -27,10 +26,11 @@ trait OffsetableDataPlumber[S, D] {
       offsetValue <- redisClient.get(OFFSET_KEY)
       offsetDT <- redisClient.get(OFFSET_DT)
       offset = offsetValue.flatMap(off => offsetDT.map(Offset(off, _)))
-      rows <- source.read(offset)
-      transformed = transform(rows)
-      newOffset <- sink.write(transformed)
-      _ <- redisClient.set(OFFSET_KEY)
+      readResult <- source.read(offset)
+      transformed = transform(readResult)
+      newOffset <- sink.write(transformed, offset)
+      _ <- setNewOffset(readResult.nextOffset)
+      _ <- IO.println(s"**** Successfully processed ${readResult.rows.size} rows ****")
     } yield ()).recoverWith {
       case NonFatal(error) =>
         IO.println(s"Error occurred while running DataPlumber: $error. Performing error handling hook") >>
@@ -42,7 +42,7 @@ trait OffsetableDataPlumber[S, D] {
 
     offset.map { off =>
       for {
-        _ <- redisClient.set(OFFSET_KEY, off.offset)
+        _ <- redisClient.set(OFFSET_KEY, off.lastOffset)
         _ <- redisClient.set(OFFSET_DT, off.dateTime.toString)
       } yield ()
     }.traverse(identity)
@@ -51,7 +51,7 @@ trait OffsetableDataPlumber[S, D] {
   /**
    * This function transform the source datastructure into the sink datastructure.
    */
-  def transform(rows: List[S]): List[D]
+  def transform(readResult: ReadResult[S]): List[D]
 
   /**
    * This function handle the error depending on the requirement.
@@ -62,11 +62,17 @@ trait OffsetableDataPlumber[S, D] {
 }
 
 trait DataSource[S] {
-  def read(offset: Option[Offset]): IO[List[S]]
+  def read(offset: Option[Offset]): IO[ReadResult[S]]
 }
 
 trait DataSink[D] {
-  def write(rows: List[D], readOffset: Option[Offset]): IO[Option[Offset]]
+  def write(rows: List[D], lastOffset: Option[Offset]): IO[Unit]
 }
 
-case class Offset(offset: String, dateTime: LocalDateTime)
+case class Offset(lastOffset: String, dateTime: String)
+
+case class ReadResult[T](rows: List[T], nextOffset: Option[Offset])
+
+trait Offsetable {
+  def id: Long
+}

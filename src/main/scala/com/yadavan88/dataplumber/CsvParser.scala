@@ -40,15 +40,17 @@ object CsvParser:
       case _: (t *: ts) => summonInline[CsvParser[t]] :: summonParsers[ts]
       case _: EmptyTuple => Nil
 
-// Convert List[String] into a tuple dynamically
-inline def tupleFromCsv[T <: Tuple](values: List[String], parsers: List[CsvParser[?]]): T =
-  values.zip(parsers).map { case (v, parser) =>
-    parser.asInstanceOf[CsvParser[Any]].parse(v)
-  } match {
-    case list => Tuple.fromArray(list.toArray).asInstanceOf[T]
-  }
+object GenericCSVParser {     
+  // Convert List[String] into a tuple dynamically
+  inline def tupleFromCsv[T <: Tuple](values: List[String], parsers: List[CsvParser[?]]): T =
+    values.zip(parsers).map { case (v, parser) =>
+      parser.asInstanceOf[CsvParser[Any]].parse(v)
+    } match {
+      case list => Tuple.fromArray(list.toArray).asInstanceOf[T]
+    }
 
-inline def fromCsvRow[A](row: List[String])(using m: Mirror.ProductOf[A]): A =
-  val parsers = CsvParser.summonParsers[m.MirroredElemTypes]
-  val tuple = tupleFromCsv[m.MirroredElemTypes](row, parsers)
-  m.fromProduct(tuple)
+  inline def fromCsvRow[A](row: List[String])(using m: Mirror.ProductOf[A]): A =
+    val parsers = CsvParser.summonParsers[m.MirroredElemTypes]
+    val tuple = tupleFromCsv[m.MirroredElemTypes](row, parsers)
+    m.fromProduct(tuple)
+  }
