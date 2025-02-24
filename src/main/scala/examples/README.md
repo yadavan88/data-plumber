@@ -241,6 +241,26 @@ def startOffsetablePlumber = {
 }
 ```
 
+We can combine multiple sources and sinks and continuously integrate data. For example, we can retry the data insert from mongo to postgres until there is no new data in mongodb to process:
+```
+@main
+def startOffsetablePlumber = {
+  import cats.syntax.*
+  val csvToMongo = new OffsetableCsvToMongoPlumber()
+  csvToMongo.run.unsafeRunSync() 
+  val mongoToPG = new OffsetableMongoToPostgresDataPlumber()
+
+  def processUntilEmpty: IO[Unit] = for {
+    count <- mongoToPG.run
+    _ <- IO.println(s"Processed $count records")
+    _ <- if (count > 0) processUntilEmpty else IO.println("Processing complete!")
+  } yield ()
+
+  processUntilEmpty.unsafeRunSync()
+
+}
+```
+
 ## Key Differences from Simple Version
 
 1. **Offset Tracking**: The framework automatically tracks processing progress using Redis
