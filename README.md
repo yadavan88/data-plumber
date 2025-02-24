@@ -25,3 +25,79 @@ It intentionally does not cover production concerns such as:
 - Error recovery
 - Connection pooling
 - Batch processing optimizations
+
+
+# Integration Types
+Data Plumber provides three different integration patterns to handle various data transfer scenarios.
+
+## 1. Simple Integration
+
+The simplest form of data integration with synchronous execution and no additional features.
+
+### Key Features:
+- Synchronous execution
+- Basic error handling
+- Direct source to sink transfer
+- No offset tracking or effect handling
+
+### Example
+```scala
+class StarLogIntegrator extends DataPlumber[StarLogEntry, MongoStarLogEntry] {
+  override def source: CsvSource[StarLogEntry] = new StarLogSource()
+  override def sink: MongoSink[MongoStarLogEntry] = new StarLogSink()
+  override def transform(list: List[StarLogEntry]): List[MongoStarLogEntry] = {
+    list.map(value => MongoStarLogEntry(...))
+  }
+}
+```
+
+
+## 2. Effectful Integration
+
+Adds support for effect handling using cats-effect IO, providing better error handling and resource management.
+
+### Key Features:
+- Effect-based execution (cats-effect IO)
+- Advanced error handling
+- Resource safety
+- Composable operations
+
+### Example:
+```scala
+
+```
+
+
+## 3. Offsetable Integration
+
+More advanced integration pattern with support for offset tracking using Redis, enabling resumable transfers and progress tracking. This can also potentially support distributed locking to avoid processing the same source data simultaneously by multiple sources.
+
+### Key Features:
+- Offset tracking via Redis
+- Resumable operations
+- Batching Source
+- Progress persistence
+- Effect-based execution
+- Named operations
+- Locking mechanism on the Source (TBA)
+
+### Example:
+```scala
+```
+
+
+## Common Components
+
+All integration types share these common elements:
+- Source definition
+- Sink definition
+- Transform logic
+- Error handling (varies by type)
+
+## Supported Source/Sink Types
+- CSV files
+- MongoDB
+- PostgreSQL
+- Custom implementations possible
+
+Each integration type builds upon the previous one, adding more features and complexity as needed for your use case.
