@@ -30,7 +30,7 @@ It intentionally does not cover production concerns such as:
 # Integration Types
 Data Plumber provides three different integration patterns to handle various data transfer scenarios.
 
-Examples of different types are [available here](src/main/scala/examples).
+Examples of different types and their sample implementation are [available here](src/main/scala/examples).
 Before running the samples, you'll need to start the required services using Docker:
 ```
 docker compose up
