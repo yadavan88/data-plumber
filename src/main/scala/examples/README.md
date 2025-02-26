@@ -242,7 +242,7 @@ def startOffsetablePlumber = {
 ```
 
 We can combine multiple sources and sinks and continuously integrate data. For example, we can retry the data insert from mongo to postgres until there is no new data in mongodb to process:
-```
+```scala
 @main
 def startOffsetablePlumber = {
   import cats.syntax.*
