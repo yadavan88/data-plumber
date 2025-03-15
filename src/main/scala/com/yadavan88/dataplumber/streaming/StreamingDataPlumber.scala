@@ -7,7 +7,7 @@ import _root_.com.yadavan88.dataplumber.offsetable.RedisClient
 import _root_.com.yadavan88.dataplumber.offsetable.Offset
 import _root_.com.yadavan88.dataplumber.offsetable.Offsetable
 import cats.implicits._
-
+import scala.concurrent.duration.*
 trait StreamingDataPlumber[S, D] {
     def source: StreamingDataSource[S]
     def sink: StreamingDataSink[D]
@@ -24,11 +24,14 @@ trait StreamingDataPlumber[S, D] {
             val offset = lastOffset.map(off => Offset(off, java.time.LocalDateTime.now.toString))
             source.read(offset)
           }
-          .chunkN(batchSize)
+          .groupWithin(batchSize, 5.seconds)
           .through(transform)
           .through(sink.write)
-          .evalMap { lastOffset => 
-              lastOffset.traverse(offset => redisClient.set(OFFSET_KEY, offset))
+          .evalMap { chunk => 
+              Option(chunk.last).flatten match {
+                case Some(lastRecord: Offsetable) => redisClient.set(OFFSET_KEY, lastRecord.id.toString)
+                case _ => IO.unit
+              }
           }
           .handleErrorWith { error =>
               Stream.eval(
@@ -57,5 +60,5 @@ trait StreamingDataSource[S] {
 }
 
 trait StreamingDataSink[D] {
-    def write: Pipe[IO, Chunk[D], Option[String]]
+    def write: Pipe[IO, Chunk[D], Chunk[D]]
 }

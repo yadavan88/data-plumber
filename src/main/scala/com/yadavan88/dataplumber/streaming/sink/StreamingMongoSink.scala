@@ -32,14 +32,15 @@ trait StreamingMongoSink[T] extends StreamingDataSink[T] {
   private val database = mongoClient.getDatabase(connectionString.getDatabase)
   private val collection = database.getCollection(collectionName)
 
-  def write: Pipe[IO, Chunk[T], Option[String]] = { stream =>
+  def write: Pipe[IO, Chunk[T], Chunk[T]] = { stream =>
     stream.evalMap { chunk =>
+      println(s"Writing ${chunk.size} documents to MongoDB")
       if (chunk.isEmpty) {
-        IO.pure(None)
+        IO.pure(Chunk.empty)
       } else {
         val documents = chunk.toList.map(toDocument)
         IO(collection.insertMany(documents.asJava))
-          .map(_ => chunk.toList.lastOption.map(_.toString))
+          .map(_ => chunk)
       }
     }
   }

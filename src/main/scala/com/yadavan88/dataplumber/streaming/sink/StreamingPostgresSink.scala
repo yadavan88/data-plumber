@@ -12,6 +12,7 @@ import com.yadavan88.dataplumber.streaming.StreamingDataSink
 import fs2.*
 import doobie.util.fragment.Fragment
 import doobie.util.update.Update0
+import com.yadavan88.dataplumber.offsetable.Offsetable
 
 trait StreamingPostgresSink[T: Write] extends StreamingDataSink[T] {
   def tableName: String
@@ -26,10 +27,10 @@ trait StreamingPostgresSink[T: Write] extends StreamingDataSink[T] {
     None
   )
 
-  def write: Pipe[IO, Chunk[T], Option[String]] = { stream =>
+  def write: Pipe[IO, Chunk[T], Chunk[T]] = { stream =>
     stream.evalMap { chunk =>
       if (chunk.isEmpty) {
-        IO.pure(None)
+        IO.pure(Chunk.empty)
       } else {
         val columns = columnNames.mkString("(", ", ", ")")
         val placeholders = List.fill(columnNames.length)("?").mkString("(", ", ", ")")
@@ -38,7 +39,7 @@ trait StreamingPostgresSink[T: Write] extends StreamingDataSink[T] {
         Update[T](sql)
           .updateMany(chunk.toList)
           .transact(xa)
-          .map(_ => chunk.toList.lastOption.map(_.toString))
+          .map(_ => chunk)
       }
     }
   }
