@@ -37,6 +37,14 @@ class StarLogMockSource extends StreamingMockSource[StarLogEntry] {
 class StarLogPostgresSink(using Write[PGStarLogEntry]) extends StreamingPostgresSink[PGStarLogEntry] {
   override def tableName: String = "starlog_streaming"
   override def connectionString: String = "jdbc:postgresql://localhost:5432/data-plumber?user=postgres&password=admin"
+  override def columnNames: List[String] = List(
+    "star_date",
+    "log_type",
+    "crew_id",
+    "entry",
+    "planetary_date",
+    "starfleet_time"
+  )
 }
 
 // class StarLogPostgresSource(using Read[StarLogEntry]) extends StreamingPostgresSource[StarLogEntry] {
@@ -57,8 +65,15 @@ case class PGStarLogEntry(
 object StarLogStreamingPostgresWriter  {
   import doobie.implicits.javatimedrivernative.*
   given Meta[LogType] = Meta[String].imap(LogType.valueOf)(_.toString)
-  given Write[PGStarLogEntry] = Write[(Long, Double, String, Int, String, LocalDate, LocalDateTime)]
-    .contramap(e => (0L, e.starDate, e.logType.toString, e.crewId, e.entry, e.planetaryDate, e.starfleetTime))
+  given Write[PGStarLogEntry] = Write[(Double, String, Int, String, LocalDate, LocalDateTime)]
+    .contramap(e => (
+      e.starDate,    
+      e.logType.toString, 
+      e.crewId,      
+      e.entry,      
+      e.planetaryDate, 
+      e.starfleetTime 
+    ))
 }
 
 class MockToPostgresStarLogDataPlumber extends StreamingDataPlumber[StarLogEntry, PGStarLogEntry] {
@@ -75,6 +90,6 @@ class MockToPostgresStarLogDataPlumber extends StreamingDataPlumber[StarLogEntry
 object StreamingDataPlumberApp extends IOApp.Simple {
   val mockToPg = new MockToPostgresStarLogDataPlumber()
   def run: IO[Unit] = 
-    IO.println("Starting streaming data plumber....") >>
+    IO.println("Starting streaming data plumber...") >>
     mockToPg.run
 }

@@ -10,10 +10,13 @@ import doobie.implicits.*
 import doobie.postgres.implicits.*
 import com.yadavan88.dataplumber.streaming.StreamingDataSink
 import fs2.*
+import doobie.util.fragment.Fragment
+import doobie.util.update.Update0
 
 trait StreamingPostgresSink[T: Write] extends StreamingDataSink[T] {
   def tableName: String
   def connectionString: String
+  def columnNames: List[String] 
 
   private val xa = Transactor.fromDriverManager[IO](
     "org.postgresql.Driver",
@@ -28,13 +31,12 @@ trait StreamingPostgresSink[T: Write] extends StreamingDataSink[T] {
       if (chunk.isEmpty) {
         IO.pure(None)
       } else {
-        val valuesFragments = chunk.toList.map { row =>
-          fr"(" ++ fr"$row" ++ fr")"
-        }.reduce(_ ++ fr"," ++ _)
-
-        val query = fr"INSERT INTO " ++ Fragment.const(tableName) ++ fr" VALUES " ++ valuesFragments
-
-        query.update.run
+        val columns = columnNames.mkString("(", ", ", ")")
+        val placeholders = List.fill(columnNames.length)("?").mkString("(", ", ", ")")
+        val sql = s"INSERT INTO $tableName $columns VALUES $placeholders"
+        
+        Update[T](sql)
+          .updateMany(chunk.toList)
           .transact(xa)
           .map(_ => chunk.toList.lastOption.map(_.toString))
       }
