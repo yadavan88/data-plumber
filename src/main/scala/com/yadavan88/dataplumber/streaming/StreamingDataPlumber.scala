@@ -14,17 +14,20 @@ trait StreamingDataPlumber[S, D] {
     def name: String
     def redisHost: String
     def batchSize: Int
+    def batchTimeout: FiniteDuration = 5.seconds
+    def pollInterval: FiniteDuration = 5.seconds
 
     private lazy val redisClient = new RedisClient(redisHost, name)
     private val OFFSET_KEY = "offset"
 
     final def run: IO[Unit] = {
-        Stream.eval(redisClient.get(OFFSET_KEY))
+        Stream.fixedRate[IO](pollInterval)
+          .evalMap(_ => redisClient.get(OFFSET_KEY))
           .flatMap { lastOffset =>
             val offset = lastOffset.map(off => Offset(off, java.time.LocalDateTime.now.toString))
             source.read(offset)
           }
-          .groupWithin(batchSize, 5.seconds)
+          .groupWithin(batchSize, batchTimeout)
           .through(transform)
           .through(sink.write)
           .evalMap { chunk => 

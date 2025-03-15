@@ -120,7 +120,8 @@ class PostgresToMongoStarLogDataPlumber extends StreamingDataPlumber[PGStarLogEn
   override val sink: StreamingMongoSink[PGStarLogEntry] = new StarLogMongoSink()
   override val name: String = "pg-to-mongo-streamingstarlog"
   override val redisHost: String = "redis://localhost:6379"
-  override val batchSize: Int = 10
+  override val batchSize: Int = 30
+  override val batchTimeout: FiniteDuration = 10.seconds
   override def handleError(error: Throwable): IO[Unit] = IO.unit
   override def transform: Pipe[IO, Chunk[PGStarLogEntry], Chunk[PGStarLogEntry]] = _.map(chunk => chunk)
 }
@@ -129,7 +130,7 @@ object StreamingDataPlumberApp extends IOApp.Simple {
   val mockToPg = new MockToPostgresStarLogDataPlumber()
   val pgToMongo = new PostgresToMongoStarLogDataPlumber()
   def run: IO[Unit] = 
-    IO.println("Starting streaming data plumber !!! ") >>
+    IO.println("Starting streaming data plumber ! ") >>
     List(
       mockToPg.run,
       pgToMongo.run
