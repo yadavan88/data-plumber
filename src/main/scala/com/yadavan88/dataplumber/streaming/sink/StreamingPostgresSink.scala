@@ -32,11 +32,11 @@ trait StreamingPostgresSink[T: Write] extends StreamingDataSink[T] {
       if (chunk.isEmpty) {
         IO.pure(Chunk.empty)
       } else {
-        val columns = columnNames.mkString("(", ", ", ")")
-        val placeholders = List.fill(columnNames.length)("?").mkString("(", ", ", ")")
-        val sql = s"INSERT INTO $tableName $columns VALUES $placeholders"
         
-        Update[T](sql)
+        val placeholder = Fragment.const(List.fill(summon[Write[T]].length)("?").mkString(","))
+        val sql = fr"INSERT INTO ${Fragment.const(tableName)} VALUES (DEFAULT,$placeholder)"
+        
+        Update[T](sql.query.sql)
           .updateMany(chunk.toList)
           .transact(xa)
           .map(_ => chunk)

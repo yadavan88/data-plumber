@@ -130,7 +130,7 @@ object StreamingDataPlumberApp extends IOApp.Simple {
   val mockToPg = new MockToPostgresStarLogDataPlumber()
   val pgToMongo = new PostgresToMongoStarLogDataPlumber()
   def run: IO[Unit] = 
-    IO.println("Starting streaming data plumber ! ") >>
+    IO.println("Starting streaming data plumber..") >>
     List(
       mockToPg.run,
       pgToMongo.run
