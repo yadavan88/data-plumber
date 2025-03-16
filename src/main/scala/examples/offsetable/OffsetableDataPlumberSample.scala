@@ -73,18 +73,18 @@ class StarLogOffsetableMongoSource extends OffsetableMongoSource[MongoStarLogEnt
 }
 
 
-// class StarLogOffsetablePostgresSink(using Write[StarLogEntry]) extends PostgresSink[StarLogEntry] {
-//   override def connectionString: String = "jdbc:postgresql://localhost:5432/data-plumber?user=postgres&password=admin"
-//   override def tableName: String = "starlog_offsetable"
-// }
-
-class StarLogOffsetablePostgresSink(using Write[StarLogEntry]) extends OffsetablePostgresSinkMagnum[StarLogEntry] {
-
-  override implicit val repo: Repo[StarLogEntry, StarLogEntry, Long] = Repo[StarLogEntry, StarLogEntry, Long]
-
+class StarLogOffsetablePostgresSink(using Write[StarLogEntry]) extends OffsetablePostgresSink[StarLogEntry] {
   override def connectionString: String = "jdbc:postgresql://localhost:5432/data-plumber?user=postgres&password=admin"
-  override def tableName: String = "starlogentry"  // I don't know how to set the name to "starlog_offsetable" in repo
+  override def tableName: String = "starlog_offsetable"
 }
+
+// class StarLogOffsetablePostgresSink(using Write[StarLogEntry]) extends OffsetablePostgresSinkMagnum[StarLogEntry] {
+
+//   override implicit val repo: Repo[StarLogEntry, StarLogEntry, Long] = Repo[StarLogEntry, StarLogEntry, Long]
+
+//   override def connectionString: String = "jdbc:postgresql://localhost:5432/data-plumber?user=postgres&password=admin"
+//   override def tableName: String = "starlogentry"  // I don't know how to set the name to "starlog_offsetable" in repo
+// }
 
 // *********************** Sample DataPlumber Implementation *********************************** 
 
@@ -126,14 +126,14 @@ class OffsetableMongoToPostgresDataPlumber extends OffsetableDataPlumber[MongoSt
 
   import StarLogOffsetablePostgresSinkWriter.given
 
-  override def source: DataSource[MongoStarLogEntry] = new StarLogOffsetableMongoSource
+  override lazy val source: DataSource[MongoStarLogEntry] = new StarLogOffsetableMongoSource
 
-  override def sink: DataSink[StarLogEntry] = new StarLogOffsetablePostgresSink
+  override lazy val sink: DataSink[StarLogEntry] = new StarLogOffsetablePostgresSink
     //new StarLogOffsetablePostgresSink
 
-  override def name: String = "mongo-to-postgres-plumber"
+  override lazy val name: String = "mongo-to-postgres-plumber"
 
-  override def redisHost: String = "redis://localhost:6379"
+  override lazy val redisHost: String = "redis://localhost:6379"
 
   override def transform(readResult: ReadResult[MongoStarLogEntry]): List[StarLogEntry] = {
     readResult.rows.map(value =>
@@ -156,19 +156,24 @@ class OffsetableMongoToPostgresDataPlumber extends OffsetableDataPlumber[MongoSt
 
 import cats.effect.unsafe.implicits.global
 
+import cats.syntax.*
+import scala.concurrent.duration.*
+
 @main
 def startOffsetablePlumber = {
-  import cats.syntax.*
+  
   val csvToMongo = new OffsetableCsvToMongoPlumber()
   csvToMongo.run.unsafeRunSync() 
+  println("starting offsetable plumber>>>>> ")
+
   val mongoToPG = new OffsetableMongoToPostgresDataPlumber()
 
-  def processUntilEmpty: IO[Unit] = for {
+  def processForever: IO[Unit] = for {
     count <- mongoToPG.run
     _ <- IO.println(s"Processed $count records")
-    _ <- if (count > 0) processUntilEmpty else IO.println("Processing complete!")
+    _ <- if (count == 0) IO.sleep(5.seconds) else IO.unit
+    _ <- processForever
   } yield ()
 
-  processUntilEmpty.unsafeRunSync()
-
+  processForever.unsafeRunSync()
 }
