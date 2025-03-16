@@ -33,7 +33,6 @@ trait StreamingPostgresSource[T <: Offsetable: Read] extends StreamingDataSource
       .getOrElse(Fragment.empty)
 
     val query = fr"SELECT * FROM" ++ Fragment.const(tableName) ++ offsetFilter ++ fr" ORDER BY id"
-    println(s"Query(offset: ${lastOffset.map(_.lastOffset)}): $query")
     
     query
       .query[T]

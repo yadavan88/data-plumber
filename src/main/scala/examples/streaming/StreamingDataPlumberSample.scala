@@ -60,6 +60,7 @@ class StarLogMongoSink extends StreamingMongoSink[PGStarLogEntry] {
 
   override protected def toDocument(value: PGStarLogEntry): Document = {
     Document.parse(s"""{
+      "id": ${value.id},
       "star_date": ${value.starDate},
       "log_type": "${value.logType}",
       "crew_id": ${value.crewId},
@@ -96,7 +97,21 @@ object StarLogStreamingPostgresWriter  {
       e.planetaryDate, 
       e.starfleetTime 
     ))
+}
 
+object StarLogStreamingPostgresMongoReaderWriter {
+  import doobie.implicits.javatimedrivernative.*
+  given Meta[LogType] = Meta[String].imap(LogType.valueOf)(_.toString)
+  given Write[PGStarLogEntry] = Write[(Long, Double, String, Int, String, LocalDate, LocalDateTime)]
+    .contramap(e => (
+      e.id,
+      e.starDate,    
+      e.logType.toString, 
+      e.crewId,      
+      e.entry,      
+      e.planetaryDate, 
+      e.starfleetTime 
+    ))
   given Read[PGStarLogEntry] = Read[(Long, Double, String, Int, String, LocalDate, LocalDateTime)].map{ v =>
     PGStarLogEntry(v._1, v._2, LogType.valueOf(v._3), v._4, v._5, v._6, v._7)
   }
@@ -115,7 +130,7 @@ class MockToPostgresStarLogDataPlumber extends StreamingDataPlumber[StarLogEntry
 
 
 class PostgresToMongoStarLogDataPlumber extends StreamingDataPlumber[PGStarLogEntry, PGStarLogEntry] {
-  import StarLogStreamingPostgresWriter.given
+  import StarLogStreamingPostgresMongoReaderWriter.given
   override val source: StreamingPostgresSource[PGStarLogEntry] = new StarLogPostgresSource()
   override val sink: StreamingMongoSink[PGStarLogEntry] = new StarLogMongoSink()
   override val name: String = "pg-to-mongo-streamingstarlog"
@@ -130,7 +145,7 @@ object StreamingDataPlumberApp extends IOApp.Simple {
   val mockToPg = new MockToPostgresStarLogDataPlumber()
   val pgToMongo = new PostgresToMongoStarLogDataPlumber()
   def run: IO[Unit] = 
-    IO.println("Starting streaming data plumber..") >>
+    IO.println("Starting streaming data plumber.") >>
     List(
       mockToPg.run,
       pgToMongo.run
