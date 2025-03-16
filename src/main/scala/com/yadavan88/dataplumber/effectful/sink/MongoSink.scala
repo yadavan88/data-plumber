@@ -3,14 +3,14 @@ package com.yadavan88.dataplumber.effectful.sink
 import cats.effect.IO
 import com.mongodb.client.MongoClients
 import com.mongodb.{ConnectionString, MongoClientSettings}
-import com.yadavan88.dataplumber.effectful.DataSink
+import com.yadavan88.dataplumber.effectful.IODataSink
 import org.bson.Document
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.*
 
-trait MongoSink[T] extends DataSink[T] {
+trait MongoSink[T] extends IODataSink[T] {
   def collectionName: String
   def mongoUri: String
 

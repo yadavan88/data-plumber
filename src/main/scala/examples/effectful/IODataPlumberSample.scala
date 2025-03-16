@@ -91,7 +91,7 @@ class StarLogSink extends MongoSink[MongoStarLogEntry] {
   }
 }
 
-class StarLogIntegrator extends DataPlumber[StarLogEntry, MongoStarLogEntry] {
+class StarLogIntegrator extends IODataPlumber[StarLogEntry, MongoStarLogEntry] {
 
   override def source: CsvSource[StarLogEntry] = new StarLogSource()
   override def sink: MongoSink[MongoStarLogEntry] = new StarLogSink()

@@ -27,7 +27,7 @@ trait OffsetablePostgresSource[T <: Offsetable: Read] extends DataSource[T] {
 
     val offsetFilter = lastOffset
       .map { offset =>
-        fr" WHERE id > ${offset.lastOffset}"
+        fr" WHERE id > CAST(" ++ Fragment.const(offset.lastOffset) ++ fr" AS BIGINT)"
       }
       .getOrElse(Fragment.empty)
 

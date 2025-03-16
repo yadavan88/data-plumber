@@ -3,9 +3,9 @@ package com.yadavan88.dataplumber.effectful
 import cats.effect.IO
 
 import scala.util.control.NonFatal
-trait DataPlumber[S, D] {
-    def source: DataSource[S]
-    def sink: DataSink[D]
+trait IODataPlumber[S, D] {
+    def source: IODataSource[S]
+    def sink: IODataSink[D]
     final def run = {
         (for {
             rows <- source.read
@@ -31,10 +31,10 @@ trait DataPlumber[S, D] {
 
 }
 
-trait DataSource[S] {
+trait IODataSource[S] {
     def read: IO[List[S]]
 }
 
-trait DataSink[D] {
+trait IODataSink[D] {
     def write(rows: List[D]): IO[Unit]
 }

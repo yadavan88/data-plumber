@@ -142,12 +142,15 @@ class PostgresToMongoStarLogDataPlumber extends StreamingDataPlumber[PGStarLogEn
 }
 
 object StreamingDataPlumberApp extends IOApp.Simple {
-  val mockToPg = new MockToPostgresStarLogDataPlumber()
+  //val mockToPg = new MockToPostgresStarLogDataPlumber()
   val pgToMongo = new PostgresToMongoStarLogDataPlumber()
-  def run: IO[Unit] = 
-    IO.println("Starting streaming data plumber.") >>
-    List(
-      mockToPg.run,
-      pgToMongo.run
-    ).parSequence.void
+   def run: IO[Unit] = 
+    IO.println("Starting streaming data plumber.") >> pgToMongo.run
+    
+  // def run: IO[Unit] = 
+  //   IO.println("Starting streaming data plumber.") >>
+  //   List(
+  //     mockToPg.run,
+  //     pgToMongo.run
+  //   ).parSequence.void
 }

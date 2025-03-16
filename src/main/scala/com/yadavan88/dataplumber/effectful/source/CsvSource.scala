@@ -1,7 +1,7 @@
 package com.yadavan88.dataplumber.effectful.source
 
 import cats.effect.IO
-import com.yadavan88.dataplumber.effectful.DataSource
+import com.yadavan88.dataplumber.effectful.IODataSource
 
 import java.io.File
 import java.time.ZoneOffset
@@ -10,7 +10,7 @@ import scala.deriving.Mirror
 import scala.io.Source
 
 // CSV Source
-trait CsvSource[T] extends DataSource[T] {
+trait CsvSource[T] extends IODataSource[T] {
   def location: String
 
   def read: IO[List[T]] = {
