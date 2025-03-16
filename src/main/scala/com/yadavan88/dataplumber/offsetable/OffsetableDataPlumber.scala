@@ -28,7 +28,7 @@ trait OffsetableDataPlumber[S, D] {
       offset = offsetValue.flatMap(off => offsetDT.map(Offset(off, _)))
       readResult <- source.read(offset)
       transformed = transform(readResult)
-      newOffset <- sink.write(transformed, offset)
+      _ <- sink.write(transformed, offset)
       _ <- setNewOffset(readResult.nextOffset)
       _ <- IO.println(s"**** Successfully processed ${readResult.rows.size} rows ****")
     } yield readResult.rows.size).recoverWith {
