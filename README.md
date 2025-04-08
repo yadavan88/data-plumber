@@ -1,6 +1,7 @@
 # data-plumber
 Moving your data through pipes, with ease!
 
+[Here](https://yadukrishnan.live/series/data-plumber) is the link to the blog series.
 
 A sample implementation showcasing clean, type-safe data integration patterns in Scala. Data-Plumber demonstrates how to build intuitive interfaces for transferring data between different sources and sinks - whether it's CSV files, MongoDB, PostgreSQL, or beyond.
 
